@@ -91,6 +91,11 @@ jobs:
     # runs-on: "${{ needs.get-label-type.outputs.label-type }}${{ matrix.runner }}"
     runs-on: "${{ matrix.runner }}"
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
+        with:
+          egress-policy: audit
+
       - name: Clean workspace
         shell: bash
         run: |
@@ -101,21 +106,21 @@ jobs:
       # [see note: pytorch repo ref]
       # deep clone (fetch-depth 0) required for git merge-base
       - name: Checkout PyTorch
-        uses: pytorch/pytorch/.github/actions/checkout-pytorch@main
+        uses: pytorch/pytorch/.github/actions/checkout-pytorch@6ea779188c21b385e03545acc7b8074e55f33bea # main
 
       - name: Setup Linux
         uses: ./.github/actions/setup-linux
 
       - name: Build docker image
         id: build-docker-image
-        uses: pytorch/test-infra/.github/actions/calculate-docker-image@main
+        uses: pytorch/test-infra/.github/actions/calculate-docker-image@0cecaa5959b2efd2855f987b8ad83c3620f2d8dd # main
         with:
           docker-image-name: ci-image:${{ matrix.docker-image-name }}
           always-rebuild: true
           push: true
 
       - name: Pull docker image
-        uses: pytorch/test-infra/.github/actions/pull-docker-image@main
+        uses: pytorch/test-infra/.github/actions/pull-docker-image@0cecaa5959b2efd2855f987b8ad83c3620f2d8dd # main
         with:
           docker-image: ${{ steps.build-docker-image.outputs.docker-image }}
 
@@ -128,7 +133,7 @@ jobs:
           echo "${docker_image_name}=${docker_image_tag}" >> docker-builds-output-${docker_image_name}.txt
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         if: contains(matrix.docker-image-name, 'rocm')
         with:
           name: docker-builds-artifacts-${{ matrix.docker-image-name }}
@@ -162,5 +167,5 @@ jobs:
         if: always()
 
       - name: Teardown Linux
-        uses: pytorch/test-infra/.github/actions/teardown-linux@main
+        uses: pytorch/test-infra/.github/actions/teardown-linux@0cecaa5959b2efd2855f987b8ad83c3620f2d8dd # main
         if: always()

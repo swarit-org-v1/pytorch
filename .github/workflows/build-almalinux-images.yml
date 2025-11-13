@@ -38,8 +38,13 @@ jobs:
       matrix:
         tag: ["cuda12.6", "cuda12.8", "cuda12.9", "cuda13.0", "rocm7.0", "rocm7.1", "cpu"]
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
+        with:
+          egress-policy: audit
+
       - name: Build docker image
-        uses: pytorch/pytorch/.github/actions/binary-docker-build@main
+        uses: pytorch/pytorch/.github/actions/binary-docker-build@b5e0e6932aabb5115ac31c52a2db1821f39dc322 # main
         with:
           docker-image-name: almalinux-builder
           custom-tag-prefix: ${{matrix.tag}}

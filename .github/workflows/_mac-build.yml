@@ -66,12 +66,17 @@ jobs:
       build-outcome: ${{ steps.build.outcome }}
       test-matrix: ${{ steps.filter.outputs.test-matrix }}
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
+        with:
+          egress-policy: audit
+
       - name: Clean up disk space before running MacOS workflow
-        uses: pytorch/test-infra/.github/actions/check-disk-space@main
+        uses: pytorch/test-infra/.github/actions/check-disk-space@0cecaa5959b2efd2855f987b8ad83c3620f2d8dd # main
 
       # [see note: pytorch repo ref]
       - name: Checkout PyTorch
-        uses: pytorch/pytorch/.github/actions/checkout-pytorch@main
+        uses: pytorch/pytorch/.github/actions/checkout-pytorch@b5e0e6932aabb5115ac31c52a2db1821f39dc322 # main
 
       - name: Set xcode version
         env:
@@ -82,7 +87,7 @@ jobs:
           fi
 
       - name: Setup Python
-        uses: pytorch/test-infra/.github/actions/setup-python@main
+        uses: pytorch/test-infra/.github/actions/setup-python@0cecaa5959b2efd2855f987b8ad83c3620f2d8dd # main
         with:
           python-version: ${{ inputs.python-version }}
           pip-requirements-file: .ci/docker/requirements-ci.txt
@@ -188,4 +193,4 @@ jobs:
       - name: Clean up disk space
         if: always()
         continue-on-error: true
-        uses: pytorch/test-infra/.github/actions/check-disk-space@main
+        uses: pytorch/test-infra/.github/actions/check-disk-space@0cecaa5959b2efd2855f987b8ad83c3620f2d8dd # main
