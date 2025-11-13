@@ -63,8 +63,13 @@ jobs:
     runs-on: ${{ needs.get-label-type.outputs.label-type }}${{ matrix.runner }}
     name: ${{ matrix.name }}:${{ matrix.tag }}
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
+        with:
+          egress-policy: audit
+
       - name: Build docker image
-        uses: pytorch/pytorch/.github/actions/binary-docker-build@main
+        uses: pytorch/pytorch/.github/actions/binary-docker-build@6ea779188c21b385e03545acc7b8074e55f33bea # main
         with:
           docker-image-name: ${{ matrix.name }}
           custom-tag-prefix: ${{ matrix.tag }}
